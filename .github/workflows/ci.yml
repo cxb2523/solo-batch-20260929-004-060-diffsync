@@ -1,0 +1,56 @@
+---
+name: "CI"
+
+on:
+  push:
+    branches:
+      - "main"
+      - "develop"
+  pull_request:
+
+jobs:
+  release-check:
+    name: "Release check (Python ${{ matrix.python-version }})"
+    runs-on: "ubuntu-latest"
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
+    services:
+      redis:
+        image: "redis:7"
+        ports:
+          - "6379:6379"
+    steps:
+      - name: "Check out repository"
+        uses: "actions/checkout@v4"
+
+      - name: "Set up Python ${{ matrix.python-version }}"
+        uses: "actions/setup-python@v5"
+        with:
+          python-version: "${{ matrix.python-version }}"
+
+      - name: "Install Poetry"
+        run: "pipx install poetry"
+
+      - name: "Install dependencies"
+        run: "poetry install --all-groups"
+
+      # Single canonical entry point, shared with the Dockerfile; the actual
+      # command lives once in tasks.py (`inv release-check`).
+      - name: "Release check"
+        run: "poetry run inv release-check"
+
+      # Reports land in build/<run-id>/ so concurrently triggered runs never
+      # overwrite each other.
+      - name: "Upload release report"
+        if: "always()"
+        uses: "actions/upload-artifact@v4"
+        with:
+          name: "release-report-${{ github.run_id }}-${{ matrix.python-version }}"
+          path: "build/${{ github.run_id }}/release-report.json"
+          if-no-files-found: "ignore"

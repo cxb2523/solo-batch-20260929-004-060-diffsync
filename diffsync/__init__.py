@@ -47,6 +47,8 @@ from diffsync.store import BaseStore
 from diffsync.store.local import LocalStore
 from diffsync.utils import get_path, set_key, tree_string
 
+__version__ = "2.2.3a0"
+
 if sys.version_info >= (3, 11):
     from typing import Self
 else:

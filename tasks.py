@@ -135,6 +135,22 @@ def generate_packages(context):
 
 @task(
     help={
+        "resume": "Resume an aborted release check run from the last checkpoint; "
+        "stages that already passed are not re-executed. (default: False)",
+    }
+)
+def release_check(context, resume=False):
+    """Run the release check state machine (lock file, ruff/mypy, pytest, poetry build, artifact assertions)."""
+    # This is the single canonical release check entry point; ci.yml and the
+    # Dockerfile both call `inv release-check` and never repeat this command.
+    command = "python -m diffsync.release_check"
+    if resume:
+        command += " --resume"
+    run_command(context, command)
+
+
+@task(
+    help={
         "check": (
             "If enabled, check for outdated dependencies in the poetry.lock file, "
             "instead of generating a new one. (default: disabled)"

@@ -1,6 +1,6 @@
 ARG PYTHON_VER="3.10"
 
-FROM python:${PYTHON_VER}-slim
+FROM python:${PYTHON_VER}-slim AS diffsync
 
 # Install Poetry manually via its installer script;
 # if we instead used "pip install poetry" it would install its own dependencies globally which may conflict with ours.
@@ -30,3 +30,9 @@ COPY . /local
 
 # Install the app
 RUN poetry install --all-groups
+
+# Release check stage: runs the same single entry point as CI
+# (`inv release-check`, defined once in tasks.py). Build it with:
+#   docker build --target release-check .
+FROM diffsync AS release-check
+RUN inv release-check
