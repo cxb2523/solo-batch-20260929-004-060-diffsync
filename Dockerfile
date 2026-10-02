@@ -30,3 +30,6 @@ COPY . /local
 
 # Install the app
 RUN poetry install --all-groups
+
+# Default container command: the same release check entry point used by CI (inv release-check).
+CMD ["inv", "release-check"]

@@ -94,6 +94,13 @@ Bumping version from 1.1.0 to 1.1.1
 
 Please see the [official Poetry documentation on `version`](https://python-poetry.org/docs/cli/#version) for more information.
 
+!!! important
+    The same version must also be set as `__version__` in `diffsync/__init__.py`. The release check verifies that `pyproject.toml`, `diffsync/__init__.py`, and the built sdist/wheel all carry the same version.
+
+### Run the Release Check
+
+Run `inv release-check` to execute the release pipeline: lock file check, ruff/mypy, pytest, `poetry build`, and artifact assertions (`py.typed` in the wheel, package data and module manifest matching `diffsync/`, version consistency, towncrier fragment naming). Completed stages, exit codes, and failure reasons are recorded in `build/release-report.json` and a terminal summary table. An interrupted run is marked `aborted` (not `failed`) and can be continued from the first incomplete stage with `inv release-check --resume`; stages that already passed are not re-executed.
+
 ### Update the Changelog
 
 !!! important

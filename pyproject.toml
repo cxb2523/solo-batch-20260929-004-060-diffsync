@@ -127,6 +127,9 @@ convention = "google"
     "D",
     "S"
 ]
+"diffsync/release_check/*" = [
+    "S",  # The release check pipeline is subprocess orchestration by design.
+]
 
 [tool.mypy]
 warn_unused_configs = true

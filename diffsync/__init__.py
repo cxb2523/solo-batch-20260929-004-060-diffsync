@@ -15,6 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+__version__ = "2.2.3a0"
+
 import sys
 from inspect import isclass
 from typing import (

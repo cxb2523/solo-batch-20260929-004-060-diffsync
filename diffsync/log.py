@@ -10,11 +10,14 @@ How to use me:
 """
 
 import logging.config
+from typing import Any, Dict, Optional
 
 APP = "diffsync"
 
 
-def initialize_logging(config=None, level="INFO", filename=None):
+def initialize_logging(
+    config: Optional[Dict[str, Any]] = None, level: str = "INFO", filename: Optional[str] = None
+) -> None:
     """Initialize logging using sensible defaults.
 
     Args:

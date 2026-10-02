@@ -65,6 +65,8 @@ class RedisStore(BaseStore):
         """Get the object from Redis key."""
         pickled_object = self._store.get(key)
         if pickled_object:
+            if isinstance(pickled_object, str):
+                pickled_object = pickled_object.encode("utf-8")
             obj_result = loads(pickled_object)  # noqa: S301
             obj_result.adapter = self.adapter
             return obj_result
@@ -168,6 +170,8 @@ class RedisStore(BaseStore):
 
         existing_obj_binary = self._store.get(object_key)
         if existing_obj_binary:
+            if isinstance(existing_obj_binary, str):
+                existing_obj_binary = existing_obj_binary.encode("utf-8")
             existing_obj = loads(existing_obj_binary)  # noqa: S301
             existing_obj_dict = existing_obj.dict()
 

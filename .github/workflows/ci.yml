@@ -1,0 +1,53 @@
+---
+name: "CI"
+
+"on":
+  push:
+    branches:
+      - "main"
+      - "develop"
+  pull_request: {}
+
+env:
+  DIFFSYNC_RELEASE_RUN_ID: "${{ github.run_id }}"
+  INVOKE_DIFFSYNC_LOCAL: "true"
+
+jobs:
+  release-check:
+    name: "release-check (py${{ matrix.python-version }})"
+    runs-on: "ubuntu-latest"
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v4"
+
+      - name: "Set up Python"
+        uses: "actions/setup-python@v5"
+        with:
+          python-version: "${{ matrix.python-version }}"
+
+      - name: "Install redis-server (for pytest-redis)"
+        run: "sudo apt-get update && sudo apt-get install -y redis-server"
+
+      - name: "Install Poetry"
+        run: "pipx install poetry"
+
+      - name: "Install dependencies"
+        run: "poetry install --all-groups"
+
+      - name: "Release check"
+        run: "poetry run inv release-check"
+
+      - name: "Upload release report"
+        if: "always()"
+        uses: "actions/upload-artifact@v4"
+        with:
+          name: "release-report-${{ github.run_id }}-py${{ matrix.python-version }}"
+          path: "build/release-reports/${{ github.run_id }}/"
